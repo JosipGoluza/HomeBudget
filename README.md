@@ -32,13 +32,14 @@ For solving this task I used FastAPI as Python framework, PostgreSQL as Relation
 ## Folder structure
 
 app:
-- models ->
-- routers -> 
-- schemas -> 
-- utils ->
-- database_connection.py ->
-- dependencies.py ->
-- main.py -> 
+- `core/` -> application configuration and database engine setup
+- `models/` -> SQLAlchemy ORM models
+- `schemas/` -> Pydantic models used for request validation and response serialization
+- `routers/` -> defines endpoints and delegates to services
+- `services/` -> business logic layer
+- `repositories/` -> all database queries
+- `dependencies.py` -> shared FastAPI dependencies
+- `main.py` -> application entry point
 
 ## Authentication and Authorization (WIP)
 
@@ -47,6 +48,13 @@ Authentication and Authorization will be implemented following OAuth2 specificat
 ### Authentication
 Authentication will use password flow where user types username and password and in return his session gets back access token.
 He then uses this token to send additional requests with this token in his Authorization header which confirms his identity and allows him to call APIs.
+
+For password hashing pwdlib library is used with PasswordHash default options. 
+It allows us to verify the password user enters with the hashed password in database which never gets exposed.
+
+For password flow, JWT tokens will be used which hold the signature of the server, the format of the token and in the body some useful parameters like sub(username).
+For signing the JWT token a random secret key was generated with the help of openssl.
+The algorithm used to sign JWT token is HS256.
 
 (maybe an authentication flow)
 
@@ -60,3 +68,9 @@ He then uses this token to send additional requests with this token in his Autho
 
 ## Tests
 For writing unit tests pytest framework will be used
+
+## Database versioning
+For versioning database Alembic is used.
+Every time the any database model changes, Alembic recognizes it and suggest a SQL upgrade function to promote this new change into the real database.
+
+## API versioning
