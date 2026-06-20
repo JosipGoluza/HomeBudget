@@ -1,7 +1,6 @@
 from fastapi import APIRouter, status
 
 from app.dependencies import SessionDep, CurrentUserDep
-from app.models.user_model import User
 from app.schemas.user_schema import UserOut, UserCreate
 from app.services import user_service
 

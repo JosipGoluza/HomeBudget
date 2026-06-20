@@ -24,7 +24,7 @@ def get_password_hash(password: str) -> str:
     return password_hash.hash(password)
 
 
-def authenticate_user(db: Session, username: str, password: str) -> type[User] | None:
+def authenticate_user(db: Session, username: str, password: str) -> User | None:
     user = user_repository.get_by_username(db, username)
     if not user:
         verify_password(password, _DUMMY_HASH)
