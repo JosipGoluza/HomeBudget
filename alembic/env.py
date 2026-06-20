@@ -21,7 +21,7 @@ if not database_url:
 config.set_main_option("sqlalchemy.url", database_url)
 
 # Import models
-from app.database_connection import Base
+from app.core.database import Base
 from app.models.user_model import User
 
 target_metadata = Base.metadata

@@ -45,4 +45,4 @@ class TestCreateUser:
         with patch("app.services.user_service.user_repository.get_by_email_or_username", return_value=MagicMock()):
             with pytest.raises(HTTPException) as exc:
                 create_user(db=MagicMock(), body=user_create_body)
-                assert exc.value.status_code == 400
+            assert exc.value.status_code == 400
