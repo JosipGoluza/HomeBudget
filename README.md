@@ -41,7 +41,7 @@ app:
 - `dependencies.py` -> shared FastAPI dependencies
 - `main.py` -> application entry point
 
-## Authentication and Authorization (WIP)
+## Authentication
 
 Authentication and Authorization will be implemented following OAuth2 specification.
 
@@ -58,19 +58,32 @@ The algorithm used to sign JWT token is HS256.
 
 (maybe an authentication flow)
 
-### Authorization (WIP)
-
 
 ## Database Schema
 
 ![schema.png](schema.png)
 
-
 ## Tests
-For writing unit tests pytest framework will be used
+For writing unit tests pytest framework is used
 
 ## Database versioning
 For versioning database Alembic is used.
-Every time the any database model changes, Alembic recognizes it and suggest a SQL upgrade function to promote this new change into the real database.
+Every time any database model changes, Alembic recognizes it and suggest a SQL upgrade function to promote this new change into the real database.
 
 ## API versioning
+
+## Categories
+User and Category are related to Many-to-Many relation (N:N) where new user_categories_xref table is created holding their relationship.
+For predefined categories, user_id value is null representing that no user owns them, but all other categories will set 
+user_id to the value of the user who created them (you need to be authenticated to create your category).
+
+## Database migration
+When starting to do GET endpoint for categories, I realized that having predefined categories global for all users didn't have much sense.
+Luckily I did not do much until that point so migrating from N : N to 1 : N (User <-> Category) was not that much painful.
+I realized that later I would have more trouble because those predefined categories will not be editable and would be static for everyone.
+Also, nobody would be able to delete those, and it is not worth to have N : N relationship just because of them.
+The only downside is that each new user will create N new predefined categories for himself, but this downside is manageable against the above mentioned consequences.
+
+This is what database looked like at that moment:
+
+![schema_old.png](schema_old.png)

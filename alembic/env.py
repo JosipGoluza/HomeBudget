@@ -23,6 +23,7 @@ config.set_main_option("sqlalchemy.url", database_url)
 # Import models
 from app.core.database import Base
 from app.models.user_model import User
+from app.models.category_model import Categories
 
 target_metadata = Base.metadata
 

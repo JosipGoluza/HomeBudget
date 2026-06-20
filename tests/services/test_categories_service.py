@@ -13,6 +13,7 @@ class TestCreateCategory:
         category = CategoryCreate(name="Test Category", description="Test Category")
         db = MagicMock()
         user = MagicMock()
+        user.id = 1
 
         mock_category = MagicMock()
         mock_category.id = 1
@@ -32,6 +33,7 @@ class TestCreateCategory:
         category = CategoryCreate(name="Test Category", description="Test Category")
         db = MagicMock()
         user = MagicMock()
+        user.id = 1
 
         with patch('app.services.category_service.category_repository.get_category_by_name', return_value=MagicMock()):
             with pytest.raises(HTTPException) as exc:
@@ -44,6 +46,7 @@ class TestCreateCategory:
         category_response = CategoryCreated(id=1, name="Test Category", description="Test Category")
         db = MagicMock()
         user = MagicMock()
+        user.id = 1
 
         mock_category = MagicMock()
         mock_category.id = 1
@@ -58,22 +61,3 @@ class TestCreateCategory:
             result = create_category(category_body, db, user)
 
         assert result == category_response
-
-    def test_links_category_to_user(self):
-        category_body = CategoryCreate(name="Test Category", description="Test Category")
-        db = MagicMock()
-        user = MagicMock()
-
-        mock_category = MagicMock()
-        mock_category.id = 1
-        mock_category.name = "Test Category"
-        mock_category.description = "Test Category"
-
-        with (
-            patch('app.services.category_service.category_repository.get_category_by_name', return_value=None),
-            patch("app.services.category_service.category_repository.add_category"),
-            patch("app.services.category_service.Categories", return_value=mock_category),
-        ):
-            create_category(category_body, db, user)
-
-        user.categories.append.assert_called_once_with(mock_category)

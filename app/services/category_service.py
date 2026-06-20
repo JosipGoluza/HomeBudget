@@ -8,16 +8,16 @@ from app.schemas.category_schema import CategoryCreate, CategoryCreated
 
 
 def create_category(category_create: CategoryCreate, db: Session, user: User) -> CategoryCreated:
-    if category_repository.get_category_by_name(category_create.name, db):
+    if category_repository.get_category_by_name(category_create.name, user.id, db):
         raise HTTPException(status_code=400, detail="Category already exists")
 
     category = Categories(
         name=category_create.name,
-        description=category_create.description
+        description=category_create.description,
+        user_id=user.id,
     )
 
     category_repository.add_category(db, category)
-    user.categories.append(category)
     db.commit()
     db.refresh(category)
 
