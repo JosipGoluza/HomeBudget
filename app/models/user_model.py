@@ -14,3 +14,4 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)
 
     categories: Mapped[List["Categories"]] = relationship(back_populates="user")
+    expenses: Mapped[List["Expense"]] = relationship(back_populates="user")
