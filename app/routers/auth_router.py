@@ -17,9 +17,31 @@ auth_router = APIRouter(
     "/token",
     status_code=status.HTTP_201_CREATED,
     response_model=Token,
-    responses={401: {"description": "Incorrect username or password"}},
+    responses={
+        201: {
+            "description": "Authentication successful, JWT token created",
+            "model": Token
+        },
+        400: {
+            "description": "Invalid request body - username and password fields are required"
+        },
+        401: {
+            "description": "Unauthorized - invalid username or password combination"
+        },
+        422: {
+            "description": "Validation error - request body format is invalid"
+        }
+    }
 )
 def login(form_data: RequestFormDep, db: SessionDep):
+    """
+    Authenticate user and return JWT access token.
+
+    **Request:** Form data with `username` and `password` fields
+
+    **Returns:** JWT token with configurable expiration time
+
+    """
     user = auth_service.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
