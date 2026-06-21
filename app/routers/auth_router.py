@@ -18,19 +18,10 @@ auth_router = APIRouter(
     status_code=status.HTTP_201_CREATED,
     response_model=Token,
     responses={
-        201: {
-            "description": "Authentication successful, JWT token created",
-            "model": Token
-        },
-        400: {
-            "description": "Invalid request body - username and password fields are required"
-        },
-        401: {
-            "description": "Unauthorized - invalid username or password combination"
-        },
-        422: {
-            "description": "Validation error - request body format is invalid"
-        }
+        201: {"description": "Authentication successful, JWT token created","model": Token},
+        400: {"description": "Invalid request body - username and password fields are required"},
+        401: {"description": "Unauthorized - invalid username or password combination"},
+        422: {"description": "Validation error - request body format is invalid"}
     }
 )
 def login(form_data: RequestFormDep, db: SessionDep):

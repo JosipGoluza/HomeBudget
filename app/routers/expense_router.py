@@ -1,15 +1,55 @@
 from datetime import datetime
+from enum import Enum
 
 from fastapi import APIRouter, Query, status
 
 from app.dependencies import CurrentUserDep, SessionDep
-from app.schemas.expense_schema import ExpenseCreate, ExpenseResponse, ExpenseUpdate
+from app.schemas.expense_schema import ExpenseCreate, ExpenseResponse, ExpenseSummaryResponse, ExpenseUpdate
 from app.services import expense_service
+
+class Period(str, Enum):
+    week = "week"
+    month = "month"
+    quarter = "quarter"
+    year = "year"
+
 
 expenses_router_v1 = APIRouter(
     prefix="/api/v1/expenses",
     tags=["expenses"],
 )
+
+
+@expenses_router_v1.get(
+    "/summary",
+    status_code=status.HTTP_200_OK,
+    response_model=ExpenseSummaryResponse,
+    responses={
+        200: {"description": "Expense summary for the given period", "model": ExpenseSummaryResponse},
+        400: {"description": "Invalid period parameters"},
+        401: {"description": "Unauthorized - missing or invalid authentication token"},
+        404: {"description": "Category not found"},
+    },
+)
+def get_expense_summary(
+    db: SessionDep,
+    user: CurrentUserDep,
+    period: Period | None = Query(default=None, description="Fixed period: 'week', 'month', 'quarter', or 'year'"),
+    date_from: datetime | None = Query(default=None, description="Custom range start (inclusive)"),
+    date_to: datetime | None = Query(default=None, description="Custom range end (inclusive)"),
+    category_id: int | None = Query(default=None, description="Filter by category ID"),
+) -> ExpenseSummaryResponse:
+    """
+    Get a summary (total amount and count) of expenses for a given period.
+
+    Provide **either** `period` **or** `date_from`+`date_to` — not both.
+
+    **Query parameters:**
+    - `period`: `'week'` | `'month'` | `'quarter'` | `'year'`
+    - `date_from` / `date_to`: custom date range (both required together)
+    - `category_id`: optional, scopes the summary to a single category
+    """
+    return expense_service.get_expense_summary(db, user, period, date_from, date_to, category_id)
 
 
 @expenses_router_v1.post(
@@ -47,13 +87,13 @@ def create_expense(body: ExpenseCreate, db: SessionDep, user: CurrentUserDep) ->
     },
 )
 def list_expenses(
-    db: SessionDep,
-    user: CurrentUserDep,
-    category_id: int | None = Query(default=None, description="Filter by category ID"),
-    amount_min: float | None = Query(default=None, description="Minimum amount (inclusive)", gt=0),
-    amount_max: float | None = Query(default=None, description="Maximum amount (inclusive)", gt=0),
-    date_from: datetime | None = Query(default=None, description="Filter expenses on or after this date"),
-    date_to: datetime | None = Query(default=None, description="Filter expenses on or before this date"),
+        db: SessionDep,
+        user: CurrentUserDep,
+        category_id: int | None = Query(default=None, description="Filter by category ID"),
+        amount_min: float | None = Query(default=None, description="Minimum amount (inclusive)", gt=0),
+        amount_max: float | None = Query(default=None, description="Maximum amount (inclusive)", gt=0),
+        date_from: datetime | None = Query(default=None, description="Filter expenses on or after this date"),
+        date_to: datetime | None = Query(default=None, description="Filter expenses on or before this date"),
 ) -> list[ExpenseResponse]:
     """
     List all expenses for the authenticated user, with optional filters.

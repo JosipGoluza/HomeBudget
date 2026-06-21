@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.models.expense_model import Expense
@@ -35,6 +35,27 @@ def get_expenses(
         query = query.where(Expense.date <= date_to)
 
     return list(db.scalars(query).all())
+
+
+def get_expense_summary(
+    user_id: int,
+    date_from: datetime,
+    date_to: datetime,
+    db: Session,
+    category_id: int | None = None,
+) -> tuple[float, int]:
+    query = (
+        select(func.sum(Expense.amount), func.count(Expense.id))
+        .where(Expense.user_id == user_id)
+        .where(Expense.date >= date_from)
+        .where(Expense.date <= date_to)
+    )
+    if category_id is not None:
+        query = query.where(Expense.category_id == category_id)
+
+    total, count = db.execute(query).one()
+
+    return total if total is not None else 0.0, count if count is not None else 0
 
 
 def add_expense(db: Session, expense: Expense) -> Expense:

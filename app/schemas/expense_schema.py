@@ -60,3 +60,11 @@ class ExpenseResponse(BaseModel):
     description: str | None = Field(description="Expense description")
     date: datetime = Field(description="Date and time of the expense")
     category_id: int = Field(description="Category this expense belongs to")
+
+
+class ExpenseSummaryResponse(BaseModel):
+    total: float = Field(description="Sum of all matched expenses")
+    count: int = Field(description="Number of matched expenses")
+    period_from: datetime = Field(description="Start of the resolved period (inclusive)")
+    period_to: datetime = Field(description="End of the resolved period (inclusive)")
+    category_id: int | None = Field(default=None, description="Category filter applied, if any")

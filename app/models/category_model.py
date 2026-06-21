@@ -15,4 +15,4 @@ class Categories(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     user: Mapped["User"] = relationship(back_populates="categories")
-    expenses: Mapped[List["Expense"]] = relationship(back_populates="category")
+    expenses: Mapped[List["Expense"]] = relationship(back_populates="category", cascade="all, delete-orphan")

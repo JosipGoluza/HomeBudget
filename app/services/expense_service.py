@@ -6,13 +6,17 @@ from sqlalchemy.orm import Session
 from app.models.expense_model import Expense
 from app.models.user_model import User
 from app.repositories import category_repository, expense_repository
-from app.schemas.expense_schema import ExpenseCreate, ExpenseResponse, ExpenseUpdate
+from app.schemas.expense_schema import ExpenseCreate, ExpenseResponse, ExpenseSummaryResponse, ExpenseUpdate
+from app.utils.date_utils import resolve_period
 
 
 def create_expense(body: ExpenseCreate, db: Session, user: User) -> ExpenseResponse:
     category = category_repository.get_category_by_id(body.category_id, db)
     if not category or category.user_id != user.id:
         raise HTTPException(status_code=404, detail="Category not found")
+
+    if user.balance < body.amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
 
     expense = Expense(
         amount=body.amount,
@@ -22,6 +26,7 @@ def create_expense(body: ExpenseCreate, db: Session, user: User) -> ExpenseRespo
         user_id=user.id,
     )
 
+    user.balance -= body.amount
     expense_repository.add_expense(db, expense)
     db.commit()
     db.refresh(expense)
@@ -80,5 +85,42 @@ def delete_expense(expense_id: int, db: Session, user: User) -> None:
     if not expense:
         raise HTTPException(status_code=404, detail="Expense not found")
 
+    user.balance += expense.amount
     expense_repository.delete_expense(db, expense)
     db.commit()
+
+
+def get_expense_summary(
+    db: Session,
+    user: User,
+    period: str | None,
+    date_from: datetime | None,
+    date_to: datetime | None,
+    category_id: int | None,
+) -> ExpenseSummaryResponse:
+
+    if period and (date_from or date_to):
+        raise HTTPException(status_code=400, detail="Provide either 'period' or 'date_from'/'date_to', not both")
+    if not period and (not date_from and not date_to):
+        raise HTTPException(status_code=400, detail="Provide either 'period' or 'date_from'/'date_to'")
+    if date_from and not date_to or not date_from and date_to :
+        raise HTTPException(status_code=400, detail="Both 'date_from' and 'date_to' are required for custom range")
+
+    if period:
+        date_from, date_to = resolve_period(period)
+
+
+    if category_id is not None:
+        category = category_repository.get_category_by_id(category_id, db)
+        if not category or category.user_id != user.id:
+            raise HTTPException(status_code=404, detail="Category not found")
+
+    total, count = expense_repository.get_expense_summary(user.id, date_from, date_to, db, category_id)
+
+    return ExpenseSummaryResponse(
+        total=total,
+        count=count,
+        period_from=date_from,
+        period_to=date_to,
+        category_id=category_id,
+    )

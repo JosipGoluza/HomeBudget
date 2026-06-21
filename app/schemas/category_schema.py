@@ -17,7 +17,24 @@ class CategoryCreate(BaseModel):
     )
 
 
-class CategoryCreated(BaseModel):
+class CategoryUpdate(BaseModel):
+    name: str | None = Field(
+        default=None,
+        description="Updated category name",
+        min_length=3,
+        max_length=50,
+        examples=["Utilities"]
+    )
+    description: str | None = Field(
+        default=None,
+        description="Updated category description",
+        min_length=3,
+        max_length=50,
+        examples=["Monthly utility bills"]
+    )
+
+
+class CategoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(description="Unique category identifier")

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.core.config import PREDEFINED_CATEGORIES
+from app.core.config import DEFAULT_BALANCE, PREDEFINED_CATEGORIES
 from app.models.category_model import Categories
 from app.models.user_model import User
 from app.repositories import user_repository
@@ -17,6 +17,7 @@ def create_user(db: Session, body: UserCreate) -> UserOut:
         email=body.email,
         username=body.username,
         hashed_password=get_password_hash(body.password),
+        balance=DEFAULT_BALANCE,
     )
     user_repository.add_user(db, user)
 

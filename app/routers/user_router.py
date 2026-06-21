@@ -14,13 +14,8 @@ user_router_v1 = APIRouter(
     "/me",
     response_model=UserOut,
     responses={
-        200: {
-            "description": "Current user profile retrieved successfully",
-            "model": UserOut
-        },
-        401: {
-            "description": "Unauthorized - missing or invalid authentication token"
-        }
+        200: {"description": "Current user profile retrieved successfully","model": UserOut},
+        401: {"description": "Unauthorized - missing or invalid authentication token"}
     }
 )
 def get_me(current_user: CurrentUserDep):
@@ -39,20 +34,10 @@ def get_me(current_user: CurrentUserDep):
     response_model=UserOut,
     status_code=status.HTTP_201_CREATED,
     responses={
-        201: {
-            "description": "User account successfully created",
-            "model": UserOut
-        },
-        400: {
-            "description": "Invalid request - validation failed"
-        },
-        409: {
-            "description": "Conflict - username or email already registered"
-        },
-        422: {
-            "description": "Validation error - request body format is invalid"
-        }
-    }
+        201: {"description": "User account successfully created","model": UserOut},
+        400: {"description": "Invalid request - validation failed"},
+        409: {"description": "Conflict - username or email already registered"},
+        422: {"description": "Validation error - request body format is invalid"}}
 )
 def create_user(body: UserCreate, db: SessionDep):
     """
