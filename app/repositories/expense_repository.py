@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
@@ -43,7 +44,7 @@ def get_expense_summary(
     date_to: datetime,
     db: Session,
     category_id: int | None = None,
-) -> tuple[float, int]:
+) -> tuple[Decimal, int]:
     query = (
         select(func.sum(Expense.amount), func.count(Expense.id))
         .where(Expense.user_id == user_id)
@@ -55,7 +56,7 @@ def get_expense_summary(
 
     total, count = db.execute(query).one()
 
-    return total if total is not None else 0.0, count if count is not None else 0
+    return total if total is not None else Decimal("0.00"), count if count is not None else 0
 
 
 def add_expense(db: Session, expense: Expense) -> Expense:

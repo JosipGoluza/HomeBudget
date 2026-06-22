@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
@@ -41,7 +43,7 @@ class UserOut(BaseModel):
     id: int = Field(description="Unique user identifier")
     email: EmailStr = Field(description="User's email address")
     username: str = Field(description="User's username")
-    balance: float = Field(description="Current account balance")
+    balance: Decimal = Field(description="Current account balance")
 
 
 class Token(BaseModel):

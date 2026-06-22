@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -26,7 +27,7 @@ def make_mock_expense(
 ):
     expense = MagicMock()
     expense.id = id_make
-    expense.amount = amount
+    expense.amount = Decimal(str(amount))
     expense.description = description
     expense.date = date
     expense.category_id = category_id
@@ -50,6 +51,7 @@ def db():
 def user():
     u = MagicMock()
     u.id = 1
+    u.balance = Decimal("1000.00")
     return u
 
 
@@ -164,7 +166,7 @@ class TestUpdateExpense:
             result = update_expense(1, body, db, user)
 
         assert isinstance(result, ExpenseResponse)
-        assert result.amount == 99.99
+        assert result.amount == Decimal("99.99")
 
     def test_raises_404_if_expense_not_found(self, db, user):
         body = ExpenseUpdate(amount=99.99)
@@ -206,7 +208,7 @@ class TestUpdateExpense:
         with patch("app.services.expense_service.expense_repository.get_expense_by_id", return_value=mock_expense):
             update_expense(1, body, db, user)
 
-        assert mock_expense.amount == 200.0
+        assert mock_expense.amount == Decimal("200.0")
         assert mock_expense.description == "Original"
         assert mock_expense.category_id == 1
 

@@ -1,12 +1,14 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class ExpenseCreate(BaseModel):
-    amount: float = Field(
+    amount: Decimal = Field(
         description="Amount spent (must be greater than 0)",
         gt=0,
+        decimal_places=2,
         examples=[49.99]
     )
     description: str | None = Field(
@@ -27,10 +29,11 @@ class ExpenseCreate(BaseModel):
 
 
 class ExpenseUpdate(BaseModel):
-    amount: float | None = Field(
+    amount: Decimal | None = Field(
         default=None,
         description="Updated amount spent (must be greater than 0)",
         gt=0,
+        decimal_places=2,
         examples=[59.99]
     )
     description: str | None = Field(
@@ -56,14 +59,14 @@ class ExpenseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(description="Unique expense identifier")
-    amount: float = Field(description="Amount spent")
+    amount: Decimal = Field(description="Amount spent")
     description: str | None = Field(description="Expense description")
     date: datetime = Field(description="Date and time of the expense")
     category_id: int = Field(description="Category this expense belongs to")
 
 
 class ExpenseSummaryResponse(BaseModel):
-    total: float = Field(description="Sum of all matched expenses")
+    total: Decimal = Field(description="Sum of all matched expenses")
     count: int = Field(description="Number of matched expenses")
     period_from: datetime = Field(description="Start of the resolved period (inclusive)")
     period_to: datetime = Field(description="End of the resolved period (inclusive)")

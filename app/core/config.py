@@ -1,10 +1,11 @@
 import os
+from decimal import Decimal
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 10
 
-DEFAULT_BALANCE: float = 10000.00
+DEFAULT_BALANCE: Decimal = Decimal("10000.00")
 
 PREDEFINED_CATEGORIES: list[tuple[str, str]] = [
     ("Groceries", "Food for daily use at home"),

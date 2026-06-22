@@ -68,6 +68,10 @@ def update_expense(expense_id: int, body: ExpenseUpdate, db: Session, user: User
         expense.category_id = body.category_id
 
     if body.amount is not None:
+        difference = body.amount - expense.amount
+        if difference > user.balance:
+            raise HTTPException(status_code=400, detail="Insufficient balance")
+        user.balance -= difference
         expense.amount = body.amount
     if body.description is not None:
         expense.description = body.description

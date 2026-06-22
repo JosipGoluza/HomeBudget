@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -19,6 +20,7 @@ class TestCreateUser:
             id=1,
             username="test_username",
             email="test123@example.com",
+            balance=0.0,
         )
         db = MagicMock()
 
@@ -26,6 +28,7 @@ class TestCreateUser:
         mock_user.id = 1
         mock_user.username = "test_username"
         mock_user.email = "test123@example.com"
+        mock_user.balance = 0.0
 
         with (
             patch("app.services.user_service.user_repository.get_by_email_or_username", return_value=None),
@@ -60,6 +63,7 @@ class TestCreateUser:
         mock_user.id = 1
         mock_user.email = "test123@example.com"
         mock_user.username = "test_username"
+        mock_user.balance = Decimal("10000.00")
 
         with (
             patch("app.services.user_service.user_repository.get_by_email_or_username", return_value=None),

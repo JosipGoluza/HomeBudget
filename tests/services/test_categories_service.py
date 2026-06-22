@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi import HTTPException
 
-from app.schemas.category_schema import CategoryCreate, CategoryCreated
+from app.schemas.category_schema import CategoryCreate, CategoryResponse
 from app.services.category_service import create_category
 
 
@@ -27,7 +27,7 @@ class TestCreateCategory:
         ):
             result = create_category(category, db, user)
 
-        assert isinstance(result, CategoryCreated)
+        assert isinstance(result, CategoryResponse)
 
     def test_raise_400_if_name_taken(self):
         category = CategoryCreate(name="Test Category", description="Test Category")
@@ -43,7 +43,7 @@ class TestCreateCategory:
 
     def test_returns_category_for_correct_body(self):
         category_body = CategoryCreate(name="Test Category", description="Test Category")
-        category_response = CategoryCreated(id=1, name="Test Category", description="Test Category")
+        category_response = CategoryResponse(id=1, name="Test Category", description="Test Category")
         db = MagicMock()
         user = MagicMock()
         user.id = 1
